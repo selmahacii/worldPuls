@@ -57,9 +57,9 @@ const getFlightColor = (velocity: number): string => {
 const getCryptoArcColor = (currency: 'BTC' | 'ETH'): string[] => {
   // Return gradient colors
   if (currency === 'BTC') {
-    return [['rgba(251, 191, 36, 0.9)'], ['rgba(251, 191, 36, 0.2)']];
+    return ['rgba(251, 191, 36, 0.9)', 'rgba(251, 191, 36, 0.2)'];
   }
-  return [['rgba(192, 132, 252, 0.9)'], ['rgba(192, 132, 252, 0.2)']];
+  return ['rgba(192, 132, 252, 0.9)', 'rgba(192, 132, 252, 0.2)'];
 };
 
 const getSportsRingColor = (sport: 'football' | 'basketball' | 'formula1'): string => {
@@ -321,46 +321,57 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
   const onGlobeReady = useCallback(() => {
     if (globeRef.current) {
       globeRef.current.pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0);
+      try {
+        const controls = globeRef.current.controls();
+        if (controls) {
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.3;
+          controls.enableZoom = true;
+          controls.enablePan = false;
+        }
+      } catch (err) {
+        console.warn('Could not set globe controls', err);
+      }
     }
   }, []);
 
   // Process flight data - enhanced for visibility
   const flightPoints = data?.flights && layers.flights
     ? data.flights
-        .filter((f) => f.lat && f.lng && !f.on_ground)
-        .map((flight) => ({
-          ...flight,
-          pointLat: flight.lat,
-          pointLng: flight.lng,
-          pointAltitude: flight.altitude / 15000000,
-          pointColor: getFlightColor(flight.velocity),
-          pointRadius: 0.15,
-        }))
+      .filter((f) => f.lat && f.lng && !f.on_ground)
+      .map((flight) => ({
+        ...flight,
+        pointLat: flight.lat,
+        pointLng: flight.lng,
+        pointAltitude: flight.altitude / 15000000,
+        pointColor: getFlightColor(flight.velocity),
+        pointRadius: 0.15,
+      }))
     : [];
 
   // Process crypto arcs with altitude variation
   const cryptoArcs = data?.crypto_arcs && layers.crypto
     ? data.crypto_arcs.map((arc, i) => ({
-        ...arc,
-        startLat: arc.from_lat,
-        startLng: arc.from_lng,
-        endLat: arc.to_lat,
-        endLng: arc.to_lng,
-        arcColor: getCryptoArcColor(arc.currency),
-        arcStroke: Math.max(0.5, Math.log10(arc.value_usd + 1) * 0.3),
-        arcAltitude: 0.12 + (i % 5) * 0.04,
-      }))
+      ...arc,
+      startLat: arc.from_lat,
+      startLng: arc.from_lng,
+      endLat: arc.to_lat,
+      endLng: arc.to_lng,
+      arcColor: getCryptoArcColor(arc.currency),
+      arcStroke: Math.max(0.5, Math.log10(arc.value_usd + 1) * 0.3),
+      arcAltitude: 0.12 + (i % 5) * 0.04,
+    }))
     : [];
 
   // Process sports rings with variation
   const sportsRings = data?.live_matches && layers.sports
     ? data.live_matches.map((match, index) => ({
-        ...match,
-        ringLat: match.lat,
-        ringLng: match.lng,
-        ringMaxRadius: 3 + (index % 3) * 0.8,
-        ringColor: getSportsRingColor(match.sport),
-      }))
+      ...match,
+      ringLat: match.lat,
+      ringLng: match.lng,
+      ringMaxRadius: 3 + (index % 3) * 0.8,
+      ringColor: getSportsRingColor(match.sport),
+    }))
     : [];
 
   // Market hex data
@@ -403,7 +414,7 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
           zIndex: 1,
         }}
       />
-      
+
       {dimensions.width > 0 && (
         <Globe
           ref={globeRef}
@@ -414,12 +425,6 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
           atmosphereColor="rgba(100, 150, 255, 0.3)"
           atmosphereAltitude={0.25}
           backgroundColor="rgba(0,0,0,0)"
-          autoRotate
-          autoRotateSpeed={0.3}
-          enableZoom={true}
-          enablePan={false}
-          minAltitude={1.5}
-          maxAltitude={5}
           // Flight points layer - enhanced visibility
           pointsData={flightPoints}
           pointLat="pointLat"
@@ -456,8 +461,8 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
             return point ? getMarketColor(point.change_pct) : '#334155';
           }}
           hexSideColor="#0f172a"
-          hexHexRadius={0.7}
-          hexResolution={3}
+          hexMargin={0.2}
+          hexBinResolution={3}
           hexLabel={marketTooltip}
           // Sports rings layer - pulsing effects
           ringsData={sportsRings}
@@ -467,7 +472,14 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
           ringColor="ringColor"
           ringPropagationSpeed={3}
           ringRepeatPeriod={800}
-          ringLabel={sportsTooltip}
+          // Labels layer for sports tooltips (since rings are not interactable)
+          labelsData={sportsRings}
+          labelLat="ringLat"
+          labelLng="ringLng"
+          labelText={() => ''}
+          labelDotRadius={0.5}
+          labelColor={() => 'rgba(255,255,255,0)'}
+          labelLabel={sportsTooltip}
           onGlobeReady={onGlobeReady}
         />
       )}

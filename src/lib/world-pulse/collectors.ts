@@ -78,7 +78,7 @@ export async function fetchFlights(): Promise<Flight[]> {
 
       flights.push({
         icao24: state[0] || '',
-        callsign: (String(state[1] || '')).trim(),
+        callsign: String(state[1] || '').replace(/^\s+|\s+$/g, ''),
         lat: latitude,
         lng: longitude,
         altitude: state[7] || 0,
