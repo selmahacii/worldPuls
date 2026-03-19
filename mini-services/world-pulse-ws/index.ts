@@ -7,8 +7,8 @@
 
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import { WorldPulsePayload } from '../../src/lib/world-pulse/types.ts';
-import { buildPayload, initCollectors, startCryptoTransactionFetcher } from '../../src/lib/world-pulse/aggregator.ts';
+import { WorldPulsePayload } from '../../src/lib/world-pulse/types';
+import { buildPayload, initCollectors, startCryptoTransactionFetcher } from '../../src/lib/world-pulse/aggregator';
 
 // Create HTTP server
 const httpServer = createServer();
