@@ -14,7 +14,24 @@ export default function LoadingScreen() {
     { label: 'Syncing Live Sports', icon: '⚽' },
   ];
 
+  const [isMounted, setIsMounted] = useState(false);
+  const [particles, setParticles] = useState<any[]>([]);
+
   useEffect(() => {
+    setIsMounted(true);
+
+    // Generate stable random particles on mount
+    const newParticles = [...Array(20)].map((_, i) => ({
+      width: 2 + Math.random() * 4,
+      height: 2 + Math.random() * 4,
+      background: `rgba(${100 + Math.random() * 100}, ${150 + Math.random() * 100}, 255, ${0.2 + Math.random() * 0.3})`,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 5 + Math.random() * 10,
+      delay: Math.random() * 5
+    }));
+    setParticles(newParticles);
+
     // Animate progress
     const progressInterval = setInterval(() => {
       setProgress(prev => {
@@ -162,7 +179,7 @@ export default function LoadingScreen() {
               }}
             />
           ))}
-          
+
           {/* Longitude lines */}
           {[0].map((_, i) => (
             <div
