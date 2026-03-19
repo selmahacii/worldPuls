@@ -1,29 +1,24 @@
 /**
- * OpenSky Network Flight Data Collector
+ * OpenSky Network - Tracking the World's Planes
  * 
- * Free API - no authentication required for anonymous access.
- * Rate limit: 10 seconds between calls for anonymous users.
+ * We use their free API to get a live snapshot of every commercial plane in the air.
+ * No API key is needed for this, but they do have a 10-second rate limit for anonymous users,
+ * so we cache the results to keep them happy.
  * 
- * Endpoint: https://opensky-network.org/api/states/all
- * Returns all aircraft currently airborne worldwide.
- * 
- * Response format: states is an array of arrays:
- * [icao24, callsign, origin_country, time_position, last_contact,
- *  longitude, latitude, baro_altitude, on_ground, velocity, true_track,
- *  vertical_rate, sensors, geo_altitude, squawk, spi, position_source]
+ * Data Source: https://opensky-network.org/api/states/all
  */
 
 import { Flight } from './types';
 import { cache, CACHE_KEYS } from './cache';
 
-// Configuration
+// Let's set some limits to keep the globe smooth
 const OPENSKY_API_URL = 'https://opensky-network.org/api/states/all';
-const MAX_FLIGHTS = 5000; // Cap for frontend performance
-const CACHE_TTL = 15; // 15 seconds cache
+const MAX_FLIGHTS = 5000; // If we show too many, the browser starts to sweat
+const CACHE_TTL = 15;     // Wait 15 seconds before asking OpenSky for updates again
 
 /**
- * Fetch all live aircraft states from OpenSky Network.
- * Filters: only airborne, valid coordinates, max 5000 aircraft.
+ * Grabs the latest airborne aircraft from OpenSky.
+ * We filter for planes that are actually in the sky and have valid GPS coordinates.
  */
 export async function fetchFlights(): Promise<Flight[]> {
   // Check cache first

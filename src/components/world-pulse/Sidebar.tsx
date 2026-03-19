@@ -1,3 +1,11 @@
+/**
+ * World Pulse - Sidebar Component
+ * 
+ * This is the control panel that sits on the right. We display summarized
+ * stats for everything happening on the globe. We use a lot of glassmorphism
+ * and ambient accent colors here to make the data feel "premium" and live.
+ */
+
 'use client';
 
 import type { WorldPulsePayload } from '@/lib/world-pulse/types';
@@ -8,7 +16,10 @@ interface SidebarProps {
   lastUpdate: Date | null;
 }
 
-// Section component with glassmorphism styling
+/**
+ * A reusable section component for our sidebar.
+ * We use subtle gradients and blurs to give it that "glass" effect.
+ */
 function DataSection({
   icon,
   title,
@@ -100,7 +111,7 @@ function StatDisplay({
   size?: 'small' | 'medium' | 'large';
 }) {
   const fontSize = size === 'large' ? '26px' : size === 'medium' ? '18px' : '14px';
-  
+
   return (
     <div>
       <div

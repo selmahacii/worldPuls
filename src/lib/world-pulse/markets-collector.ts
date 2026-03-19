@@ -1,10 +1,9 @@
 /**
- * Stock Market Data Collector
+ * Global Stock Markets (via Yahoo Finance)
  * 
- * Uses Yahoo Finance API (free, no key required).
- * Maps major stock indices to countries for globe visualization.
- * 
- * All data is REAL market data from Yahoo Finance.
+ * We track major global indices—from the S&P 500 to the Nikkei—to see 
+ * the world's economic health at a glance. We fetch these directly from 
+ * Yahoo Finance and map them to their home countries on our 3D globe.
  */
 
 import { MarketCountry } from './types';
@@ -56,16 +55,16 @@ async function fetchQuote(ticker: string): Promise<{ price: number; changePct: n
 
     const data: YahooChartResponse = await response.json();
     const result = data.chart?.result?.[0];
-    
+
     if (!result?.meta) {
       return null;
     }
 
     const { regularMarketPrice, previousClose } = result.meta;
-    const changePct = previousClose > 0 
-      ? ((regularMarketPrice - previousClose) / previousClose) * 100 
+    const changePct = previousClose > 0
+      ? ((regularMarketPrice - previousClose) / previousClose) * 100
       : 0;
-    
+
     const volume = result.indicators?.quote?.[0]?.volume?.slice(-1)[0] || 0;
 
     return {
@@ -73,7 +72,7 @@ async function fetchQuote(ticker: string): Promise<{ price: number; changePct: n
       changePct,
       volume,
     };
-    
+
   } catch (error) {
     console.warn(`[Markets] Error fetching ${ticker}:`, error);
     return null;
@@ -92,13 +91,13 @@ export async function fetchMarkets(): Promise<MarketCountry[]> {
   }
 
   console.log('[Markets] Fetching real data from Yahoo Finance...');
-  
+
   const results: MarketCountry[] = [];
 
   // Fetch quotes in parallel
   const fetchPromises = STOCK_INDICES.map(async ([ticker, country, name]) => {
     const quote = await fetchQuote(ticker);
-    
+
     if (!quote) {
       return null;
     }
@@ -120,7 +119,7 @@ export async function fetchMarkets(): Promise<MarketCountry[]> {
   });
 
   const marketResults = await Promise.all(fetchPromises);
-  
+
   for (const result of marketResults) {
     if (result) {
       results.push(result);
@@ -129,7 +128,7 @@ export async function fetchMarkets(): Promise<MarketCountry[]> {
 
   // Cache the results
   cache.set(CACHE_KEYS.MARKETS, results, CACHE_TTL);
-  
+
   console.log(`[Markets] ✅ Fetched ${results.length} real market indices`);
   return results;
 }

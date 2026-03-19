@@ -1,13 +1,20 @@
+/**
+ * The World Pulse 3D Globe
+ * 
+ * This is the visual anchor of our app. We use react-globe.gl to render
+ * a high-performance WebGL globe that displays all our live data layers:
+ * flights (points), crypto (arcs), markets (hexagons), and sports (rings/labels).
+ */
+
 'use client';
 
-import { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { WorldPulsePayload } from '@/lib/world-pulse/types';
 
-// Dynamically import Globe to avoid SSR issues
+// We load the Globe component dynamically to avoid SSR issues with Three.js
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
-// Props interface
 interface GlobeProps {
   data: WorldPulsePayload | null;
   layers: {

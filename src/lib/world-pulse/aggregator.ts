@@ -1,9 +1,9 @@
 /**
- * Data Aggregator
+ * The Data Aggregator
  * 
- * Combines all data sources into a single WorldPulsePayload.
- * All data is REAL - no mock data fallbacks.
- * Handles partial failures gracefully.
+ * This is where our app's "heartbeat" is formed. We pull from all our live sources
+ * and bundle them into one single payload. No placeholders allowed here - it's 
+ * all 100% real live data.
  */
 
 import { WorldPulsePayload, WorldStats, Flight, CryptoArc, MarketCountry, LiveMatch } from './types';
@@ -13,9 +13,8 @@ import { fetchMarkets } from './markets-collector';
 import { fetchLiveSports } from './sports-collector';
 
 /**
- * Build a complete payload from all data sources.
- * Fetches concurrently and handles partial failures.
- * NO MOCK DATA - only real live data.
+ * Grabbing all the data at once.
+ * We fetch everything in parallel so we aren't waiting too long on one slow API.
  */
 export async function buildPayload(): Promise<WorldPulsePayload> {
   // Fetch all data sources concurrently
@@ -26,16 +25,16 @@ export async function buildPayload(): Promise<WorldPulsePayload> {
   ]);
 
   // Extract results - empty arrays on failure (no mock data)
-  const flights: Flight[] = flightsResult.status === 'fulfilled' 
-    ? flightsResult.value 
+  const flights: Flight[] = flightsResult.status === 'fulfilled'
+    ? flightsResult.value
     : [];
 
-  const markets: MarketCountry[] = marketsResult.status === 'fulfilled' 
-    ? marketsResult.value 
+  const markets: MarketCountry[] = marketsResult.status === 'fulfilled'
+    ? marketsResult.value
     : [];
 
-  const matches: LiveMatch[] = sportsResult.status === 'fulfilled' 
-    ? sportsResult.value 
+  const matches: LiveMatch[] = sportsResult.status === 'fulfilled'
+    ? sportsResult.value
     : [];
 
   // Get recent real crypto arcs
@@ -67,12 +66,12 @@ export async function buildPayload(): Promise<WorldPulsePayload> {
  */
 export async function initCollectors(): Promise<void> {
   console.log('[Aggregator] Initializing real data collectors...');
-  
+
   await Promise.all([
     initCryptoCollector(),
     updateCryptoPrices(),
   ]);
-  
+
   console.log('[Aggregator] ✅ Real data collectors initialized');
 }
 

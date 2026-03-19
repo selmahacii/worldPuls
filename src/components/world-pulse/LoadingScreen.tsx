@@ -1,3 +1,11 @@
+/**
+ * The World Pulse "Boot" Sequence
+ * 
+ * We show this while we're establishing our first WebSocket connection and 
+ * waiting for the initial batch of real data. It includes a progress bar
+ * and some high-tech ambient particles to make the wait feel instantaneous.
+ */
+
 'use client';
 
 import { useEffect, useState } from 'react';

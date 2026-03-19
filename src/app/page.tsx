@@ -1,6 +1,14 @@
+/**
+ * The World Pulse Dashboard Page
+ * 
+ * This is our main command center. It orchestrates all the components:
+ * the 3D globe, the real-time stats sidebar, and the connection status indicators.
+ * We've designed this to feel like a high-tech monitoring station for the entire planet.
+ */
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useWorldPulse } from '@/hooks/useWorldPulse';
 import { LayerVisibility } from '@/lib/world-pulse/types';
@@ -10,7 +18,8 @@ import ConnectionStatus from '@/components/world-pulse/ConnectionStatus';
 import LoadingScreen from '@/components/world-pulse/LoadingScreen';
 import Legend from '@/components/world-pulse/Legend';
 
-// Dynamically import Globe to avoid SSR issues with react-globe.gl
+// We load our Globe dynamically because Three.js/WebGL logic only works in the browser.
+// This keeps our initial bundle light and avoids server-side errors.
 const Globe = dynamic(() => import('@/components/world-pulse/Globe'), {
   ssr: false,
   loading: () => null,

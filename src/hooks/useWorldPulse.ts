@@ -1,8 +1,9 @@
 /**
- * WebSocket Hook for World Pulse
+ * The World Pulse WebSocket Hook
  * 
- * Connects to the WebSocket server and provides real-time data updates.
- * Includes automatic reconnection with exponential backoff.
+ * This is our main pipeline for real-time updates. It connects to our server,
+ * listens for new data, and automatically tries to reconnect if the signal drops.
+ * We've got exponential backoff built-in so we don't spam the server on a bad connection.
  */
 
 'use client';

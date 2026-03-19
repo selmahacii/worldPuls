@@ -1,13 +1,12 @@
 /**
- * Real Crypto Transaction Collector
+ * The Real-Time Crypto Pulse
  * 
- * Uses Blockchain.com API for real-time Bitcoin transactions.
- * Maps transactions to geographic locations based on known exchange
- * jurisdictions and mining pool locations.
+ * This is arguably the most "live" part of the app. We use Blockchain.com's 
+ * WebSocket-style updates and unconfirmed transaction lists to see BTC moving across 
+ * the globe. We map these to physical locations based on major exchange servers 
+ * and mining powerhouses.
  * 
- * APIs used:
- * - Blockchain.com: Real-time unconfirmed BTC transactions (no key required)
- * - CoinGecko: BTC/ETH price data
+ * No API keys needed—we're just listening to the public heartbeat of the chain.
  */
 
 import { CryptoArc } from './types';
@@ -52,7 +51,7 @@ export async function updateCryptoPrices(): Promise<void> {
 
     cache.set(CACHE_KEYS.CRYPTO_PRICE, { btc: btcPriceUsd, eth: ethPriceUsd }, 60);
     console.log(`[Crypto] Prices updated: BTC $${btcPriceUsd.toLocaleString()}, ETH $${ethPriceUsd.toLocaleString()}`);
-    
+
   } catch (error) {
     console.warn('[Crypto] Price update error:', error);
   }
@@ -73,7 +72,7 @@ async function fetchUnconfirmedTransactions(): Promise<any[]> {
 
     const data = await response.json();
     return data.txs || [];
-    
+
   } catch (error) {
     console.warn('[Crypto] Failed to fetch unconfirmed transactions:', error);
     return [];
@@ -86,14 +85,14 @@ async function fetchUnconfirmedTransactions(): Promise<any[]> {
 function getExchangeCountry(): { code: string; weight: number } {
   const random = Math.random();
   let cumulative = 0;
-  
+
   for (const entry of CRYPTO_EXCHANGE_LOCATIONS) {
     cumulative += entry.weight;
     if (random <= cumulative) {
       return entry;
     }
   }
-  
+
   return CRYPTO_EXCHANGE_LOCATIONS[0];
 }
 
@@ -123,12 +122,12 @@ function processTransaction(tx: any): CryptoArc | null {
       return null;
     }
 
-    // Assign geographic locations based on exchange patterns
-    // Real blockchain transactions don't have geographic data,
-    // so we assign likely source/destination based on exchange jurisdictions
+    // We map transactions to likely regions
+    // Since Bitcoin itself doesn't have "GPS," we use the jurisdictions of major 
+    // exchanges to visualize the flow between global financial hubs.
     const fromExchange = getExchangeCountry();
     let toExchange = getExchangeCountry();
-    
+
     // Ensure different countries for visual interest
     let attempts = 0;
     while (toExchange.code === fromExchange.code && attempts < 5) {
@@ -151,7 +150,7 @@ function processTransaction(tx: any): CryptoArc | null {
       tx_hash: tx.hash || '',
       timestamp: Date.now(),
     };
-    
+
   } catch (error) {
     return null;
   }
@@ -183,10 +182,10 @@ export function getRecentArcs(): CryptoArc[] {
 export async function fetchRealCryptoTransactions(): Promise<CryptoArc[]> {
   const txs = await fetchUnconfirmedTransactions();
   const newArcs: CryptoArc[] = [];
-  
+
   // Process up to 10 transactions per batch
   const batchSize = Math.min(txs.length, 10);
-  
+
   for (let i = 0; i < batchSize; i++) {
     const arc = processTransaction(txs[i]);
     if (arc) {
@@ -194,11 +193,11 @@ export async function fetchRealCryptoTransactions(): Promise<CryptoArc[]> {
       newArcs.push(arc);
     }
   }
-  
+
   if (newArcs.length > 0) {
     console.log(`[Crypto] Processed ${newArcs.length} real BTC transactions (values > $${MIN_CRYPTO_USD.toLocaleString()})`);
   }
-  
+
   return newArcs;
 }
 
@@ -217,9 +216,9 @@ const MIN_CRYPTO_USD = MIN_CRYPTO_VALUE_USD;
  */
 export async function initCryptoCollector(): Promise<void> {
   console.log('[Crypto] Initializing with real Blockchain.com data...');
-  
+
   await updateCryptoPrices();
-  
+
   // Fetch initial batch of transactions
   const arcs = await fetchRealCryptoTransactions();
   console.log(`[Crypto] Initial load: ${arcs.length} real transactions`);
