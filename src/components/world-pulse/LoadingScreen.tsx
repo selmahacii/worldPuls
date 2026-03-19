@@ -17,6 +17,8 @@ export default function LoadingScreen() {
   const [isMounted, setIsMounted] = useState(false);
   const [particles, setParticles] = useState<any[]>([]);
 
+  const [globeDots, setGlobeDots] = useState<any[]>([]);
+
   useEffect(() => {
     setIsMounted(true);
 
@@ -31,6 +33,13 @@ export default function LoadingScreen() {
       delay: Math.random() * 5
     }));
     setParticles(newParticles);
+
+    // Generate stable random dots on mount
+    const newDots = [...Array(8)].map((_, i) => ({
+      angle: (i / 8) * Math.PI * 2,
+      radius: 35 + Math.random() * 15
+    }));
+    setGlobeDots(newDots);
 
     // Animate progress
     const progressInterval = setInterval(() => {
@@ -94,19 +103,19 @@ export default function LoadingScreen() {
       />
 
       {/* Floating particles */}
-      {[...Array(20)].map((_, i) => (
+      {isMounted && particles.map((p, i) => (
         <div
           key={i}
           style={{
             position: 'absolute',
-            width: `${2 + Math.random() * 4}px`,
-            height: `${2 + Math.random() * 4}px`,
-            background: `rgba(${100 + Math.random() * 100}, ${150 + Math.random() * 100}, 255, ${0.2 + Math.random() * 0.3})`,
+            width: `${p.width}px`,
+            height: `${p.height}px`,
+            background: p.background,
             borderRadius: '50%',
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${5 + Math.random() * 10}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            animation: `float ${p.duration}s ease-in-out infinite`,
+            animationDelay: `${p.delay}s`,
           }}
         />
       ))}
@@ -197,28 +206,24 @@ export default function LoadingScreen() {
           ))}
 
           {/* Data point dots */}
-          {[...Array(8)].map((_, i) => {
-            const angle = (i / 8) * Math.PI * 2;
-            const radius = 35 + Math.random() * 15;
-            return (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  width: '3px',
-                  height: '3px',
-                  background: i % 2 === 0 ? '#60a5fa' : '#a855f7',
-                  borderRadius: '50%',
-                  transform: `translate(-50%, -50%) translate(${Math.cos(angle) * radius}px, ${Math.sin(angle) * radius}px)`,
-                  boxShadow: `0 0 6px ${i % 2 === 0 ? 'rgba(96, 165, 250, 0.8)' : 'rgba(168, 85, 247, 0.8)'}`,
-                  animation: `dataPulse ${1.5 + i * 0.2}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.15}s`,
-                }}
-              />
-            );
-          })}
+          {isMounted && globeDots.map((dot, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '3px',
+                height: '3px',
+                background: i % 2 === 0 ? '#60a5fa' : '#a855f7',
+                borderRadius: '50%',
+                transform: `translate(-50%, -50%) translate(${Math.cos(dot.angle) * dot.radius}px, ${Math.sin(dot.angle) * dot.radius}px)`,
+                boxShadow: `0 0 6px ${i % 2 === 0 ? 'rgba(96, 165, 250, 0.8)' : 'rgba(168, 85, 247, 0.8)'}`,
+                animation: `dataPulse ${1.5 + i * 0.2}s ease-in-out infinite`,
+                animationDelay: `${i * 0.15}s`,
+              }}
+            />
+          ))}
         </div>
       </div>
 

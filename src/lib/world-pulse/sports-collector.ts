@@ -16,6 +16,12 @@ const ESPN_APIS = {
   nfl: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',
   ncaab: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard',
   ncaaf: 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard',
+  epl: 'https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard',
+  laliga: 'https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard',
+  seriea: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard',
+  bundesliga: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
+  ligue1: 'https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard',
+  ucl: 'https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard',
 };
 
 interface ESPNEvent {
@@ -67,7 +73,7 @@ async function fetchLiveGames(
 
     const data = await response.json();
     const events: ESPNEvent[] = data.events || [];
-    
+
     const matches: LiveMatch[] = [];
 
     for (const event of events) {
@@ -78,7 +84,7 @@ async function fetchLiveGames(
 
       const competition = event.competitions[0];
       const venueName = competition.venue?.fullName;
-      
+
       // Look up stadium coordinates
       const stadium = STADIUMS[venueName];
       if (!stadium) {
@@ -108,7 +114,7 @@ async function fetchLiveGames(
     }
 
     return matches;
-    
+
   } catch (error) {
     console.warn(`[Sports] ${league} fetch error:`, error);
     return [];
@@ -127,21 +133,27 @@ export async function fetchLiveSports(): Promise<LiveMatch[]> {
   }
 
   console.log('[Sports] Fetching live games from ESPN...');
-  
+
   // Fetch from all sports APIs in parallel
-  const [nbaGames, nflGames, ncaabGames, ncaafGames] = await Promise.all([
+  const sportsResults = await Promise.all([
     fetchLiveGames(ESPN_APIS.nba, 'basketball', 'NBA'),
     fetchLiveGames(ESPN_APIS.nfl, 'football', 'NFL'),
     fetchLiveGames(ESPN_APIS.ncaab, 'basketball', 'NCAAB'),
     fetchLiveGames(ESPN_APIS.ncaaf, 'football', 'NCAAF'),
+    fetchLiveGames(ESPN_APIS.epl, 'football', 'EPL'),
+    fetchLiveGames(ESPN_APIS.laliga, 'football', 'La Liga'),
+    fetchLiveGames(ESPN_APIS.seriea, 'football', 'Serie A'),
+    fetchLiveGames(ESPN_APIS.bundesliga, 'football', 'Bundesliga'),
+    fetchLiveGames(ESPN_APIS.ligue1, 'football', 'Ligue 1'),
+    fetchLiveGames(ESPN_APIS.ucl, 'football', 'UCL'),
   ]);
 
-  const allMatches = [...nbaGames, ...nflGames, ...ncaabGames, ...ncaafGames];
-  
+  const allMatches = sportsResults.flat();
+
   // Cache the results
   cache.set(CACHE_KEYS.SPORTS, allMatches, CACHE_TTL);
-  
-  console.log(`[Sports] ✅ Found ${allMatches.length} live games (NBA: ${nbaGames.length}, NFL: ${nflGames.length}, NCAAB: ${ncaabGames.length}, NCAAF: ${ncaafGames.length})`);
-  
+
+  console.log(`[Sports] ✅ Found ${allMatches.length} live games globally`);
+
   return allMatches;
 }

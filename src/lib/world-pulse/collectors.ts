@@ -34,7 +34,7 @@ export async function fetchFlights(): Promise<Flight[]> {
 
   try {
     console.log('[Flights] Fetching live data from OpenSky Network...');
-    
+
     const response = await fetch(OPENSKY_API_URL, {
       method: 'GET',
       headers: {
@@ -57,20 +57,20 @@ export async function fetchFlights(): Promise<Flight[]> {
     }
 
     const flights: Flight[] = [];
-    
+
     // OpenSky returns arrays: [icao24, callsign, origin_country, time_position, 
     // last_contact, longitude, latitude, baro_altitude, on_ground, velocity, true_track, ...]
     for (const state of states.slice(0, MAX_FLIGHTS)) {
       const longitude = state[5];
       const latitude = state[6];
-      
+
       // Skip if missing coordinates
       if (longitude === null || latitude === null) {
         continue;
       }
-      
+
       const onGround = state[8];
-      
+
       // Skip if on ground
       if (onGround) {
         continue;
@@ -78,7 +78,7 @@ export async function fetchFlights(): Promise<Flight[]> {
 
       flights.push({
         icao24: state[0] || '',
-        callsign: (state[1] || '').trim(),
+        callsign: (String(state[1] || '')).trim(),
         lat: latitude,
         lng: longitude,
         altitude: state[7] || 0,
@@ -93,17 +93,17 @@ export async function fetchFlights(): Promise<Flight[]> {
     cache.set(CACHE_KEYS.FLIGHTS, flights, CACHE_TTL);
     console.log(`[Flights] ✅ Fetched ${flights.length} live flights from OpenSky`);
     return flights;
-    
+
   } catch (error) {
     console.error('[Flights] ❌ Fetch error:', error);
-    
+
     // Return cached data if available
     const cachedFlights = cache.get<Flight[]>(CACHE_KEYS.FLIGHTS);
     if (cachedFlights && cachedFlights.length > 0) {
       console.log(`[Flights] Using cached data: ${cachedFlights.length} flights`);
       return cachedFlights;
     }
-    
+
     // Return empty array - no mock data
     return [];
   }

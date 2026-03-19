@@ -41,7 +41,7 @@ export function useWorldPulse(options: UseWorldPulseOptions = {}): UseWorldPulse
   const [data, setData] = useState<WorldPulsePayload | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
-  
+
   const socketRef = useRef<Socket | null>(null);
   const retryCountRef = useRef(0);
   const retryTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,12 +63,16 @@ export function useWorldPulse(options: UseWorldPulseOptions = {}): UseWorldPulse
       setStatus('connecting');
 
       try {
-        // Connect to WebSocket server
-        const socket = io(`/?XTransformPort=${WS_PORT}`, {
+        // For local development without proxy, we need to connect to the WS port directly
+        const wsUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+          ? `http://127.0.0.1:${WS_PORT}`
+          : `/?XTransformPort=${WS_PORT}`;
+
+        const socket = io(wsUrl, {
           transports: ['websocket', 'polling'],
           forceNew: true,
           reconnection: false,
-          timeout: 10000,
+          timeout: 20000,
         });
 
         socketRef.current = socket;
@@ -118,7 +122,7 @@ export function useWorldPulse(options: UseWorldPulseOptions = {}): UseWorldPulse
       const delay = Math.min(30000, 1000 * Math.pow(2, retryCountRef.current));
       retryCountRef.current++;
       console.log(`[WorldPulse] Reconnecting in ${delay}ms...`);
-      
+
       retryTimerRef.current = setTimeout(() => {
         if (mountedRef.current) {
           connect();

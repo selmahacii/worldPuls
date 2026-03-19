@@ -9,7 +9,6 @@ import { buildPayload, initCollectors, startCryptoTransactionFetcher } from './s
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
-    path: '/',
     cors: { origin: '*', methods: ['GET', 'POST'] },
 });
 
@@ -60,8 +59,8 @@ const PORT = 3003;
 async function start() {
     await initCollectors();
     startCryptoTransactionFetcher();
-    httpServer.listen(PORT, () => {
-        console.log(`[WS] World Pulse WebSocket server running on port ${PORT}`);
+    httpServer.listen(PORT, '0.0.0.0', () => {
+        console.log(`[WS] World Pulse WebSocket server listening on 0.0.0.0:${PORT}`);
     });
 }
 
