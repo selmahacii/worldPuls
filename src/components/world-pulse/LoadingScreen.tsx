@@ -114,7 +114,10 @@ export default function LoadingScreen() {
             borderRadius: '50%',
             left: `${p.left}%`,
             top: `${p.top}%`,
-            animation: `float ${p.duration}s ease-in-out infinite`,
+            animationName: 'float',
+            animationDuration: `${p.duration}s`,
+            animationTimingFunction: 'ease-in-out',
+            animationIterationCount: 'infinite',
             animationDelay: `${p.delay}s`,
           }}
         />
@@ -140,7 +143,10 @@ export default function LoadingScreen() {
               transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
               border: `1px solid rgba(59, 130, 246, ${0.1 - i * 0.03})`,
-              animation: `pulse ${2 + i * 0.5}s ease-in-out infinite`,
+              animationName: 'pulse',
+              animationDuration: `${2 + i * 0.5}s`,
+              animationTimingFunction: 'ease-in-out',
+              animationIterationCount: 'infinite',
             }}
           />
         ))}
@@ -169,7 +175,10 @@ export default function LoadingScreen() {
               inset -10px -10px 40px rgba(0, 30, 60, 0.5)
             `,
             position: 'relative',
-            animation: 'globeRotate 20s linear infinite, globeGlow 3s ease-in-out infinite',
+            animationName: 'globeRotate, globeGlow',
+            animationDuration: '20s, 3s',
+            animationTimingFunction: 'linear, ease-in-out',
+            animationIterationCount: 'infinite, infinite',
           }}
         >
           {/* Latitude lines */}
@@ -219,7 +228,10 @@ export default function LoadingScreen() {
                 borderRadius: '50%',
                 transform: `translate(-50%, -50%) translate(${Math.cos(dot.angle) * dot.radius}px, ${Math.sin(dot.angle) * dot.radius}px)`,
                 boxShadow: `0 0 6px ${i % 2 === 0 ? 'rgba(96, 165, 250, 0.8)' : 'rgba(168, 85, 247, 0.8)'}`,
-                animation: `dataPulse ${1.5 + i * 0.2}s ease-in-out infinite`,
+                animationName: 'dataPulse',
+                animationDuration: `${1.5 + i * 0.2}s`,
+                animationTimingFunction: 'ease-in-out',
+                animationIterationCount: 'infinite',
                 animationDelay: `${i * 0.15}s`,
               }}
             />
