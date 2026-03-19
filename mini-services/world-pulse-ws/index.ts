@@ -7,8 +7,8 @@
 
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import { WorldPulsePayload } from '../../src/lib/world-pulse/types';
-import { buildPayload, initCollectors, startCryptoTransactionFetcher } from '../../src/lib/world-pulse/aggregator';
+import { WorldPulsePayload } from '../../src/lib/world-pulse/types.ts';
+import { buildPayload, initCollectors, startCryptoTransactionFetcher } from '../../src/lib/world-pulse/aggregator.ts';
 
 // Create HTTP server
 const httpServer = createServer();
@@ -41,12 +41,12 @@ async function broadcast(): Promise<void> {
 
   try {
     const payload = await buildPayload();
-    
+
     // Emit to all clients
     io.emit('world-pulse-update', payload);
-    
+
     console.log(`[WS] Broadcasted to ${connectedClients.size} clients: ${payload.flights.length} flights, ${payload.crypto_arcs.length} crypto arcs`);
-    
+
   } catch (error) {
     console.error('[WS] Broadcast error:', error);
   }
@@ -59,15 +59,15 @@ function startBroadcasting(): void {
   if (isBroadcasting) {
     return;
   }
-  
+
   isBroadcasting = true;
-  
+
   // Broadcast immediately on first connection
   broadcast();
-  
+
   // Then every 5 seconds
   broadcastInterval = setInterval(broadcast, 5000);
-  
+
   console.log('[WS] Started broadcasting');
 }
 
@@ -134,10 +134,10 @@ const PORT = 3003;
 async function start() {
   // Initialize data collectors
   await initCollectors();
-  
+
   // Start periodic crypto transaction fetching
   startCryptoTransactionFetcher();
-  
+
   httpServer.listen(PORT, () => {
     console.log(`[WS] World Pulse WebSocket server running on port ${PORT}`);
   });
