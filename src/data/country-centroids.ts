@@ -99,9 +99,9 @@ export const CRYPTO_ADOPTION_COUNTRIES: [string, number][] = [
 // Crypto exchange locations with trading volume weights
 // Based on real exchange headquarters and trading activity
 export const CRYPTO_EXCHANGE_LOCATIONS: Array<{ code: string; weight: number; exchanges: string[] }> = [
-  { code: 'US', weight: 0.28, exchanges: ['Coinbase', 'Kraken', 'Gemini', 'Binance.US'] },
+  { code: 'US', weight: 0.28, exchanges: ['Coinbase', 'Kraken', 'Bittrex', 'Binance.US'] },
   { code: 'SG', weight: 0.15, exchanges: ['Crypto.com', 'Independent Reserve'] },
-  { code: 'HK', weight: 0.12, exchanges: ['Bitfinex', 'Bit-Z'] },
+  { code: 'HK', weight: 0.12, exchanges: ['Bitfinex', 'OKX'] },
   { code: 'JP', weight: 0.10, exchanges: ['bitFlyer', 'Coincheck', 'Liquid'] },
   { code: 'GB', weight: 0.08, exchanges: ['Bitstamp UK', 'CEX.io'] },
   { code: 'DE', weight: 0.06, exchanges: ['Bitstamp', 'Kraken EU'] },
