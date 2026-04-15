@@ -12,11 +12,10 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useWorldPulse } from '@/hooks/useWorldPulse';
 import { LayerVisibility } from '@/lib/world-pulse/types';
-import LayerControls from '@/components/world-pulse/LayerControls';
 import Sidebar from '@/components/world-pulse/Sidebar';
-import ConnectionStatus from '@/components/world-pulse/ConnectionStatus';
 import LoadingScreen from '@/components/world-pulse/LoadingScreen';
 import Legend from '@/components/world-pulse/Legend';
+import Navbar from '@/components/world-pulse/Navbar';
 
 // We load our Globe dynamically because Three.js/WebGL logic only works in the browser.
 // This keeps our initial bundle light and avoids server-side errors.
@@ -93,14 +92,12 @@ export default function WorldPulsePage() {
       {/* 3D Globe - fullscreen background */}
       <Globe data={data} layers={layers} />
 
-      {/* Connection status - top left */}
-      <ConnectionStatus connected={isConnected} />
-
-      {/* Layer toggle buttons - top center */}
-      <LayerControls
+      {/* Unified Navigation Dock */}
+      <Navbar
         layers={layers}
         onToggle={toggleLayer}
         data={data}
+        connected={isConnected}
       />
 
       {/* Stats sidebar - right side */}
@@ -113,121 +110,38 @@ export default function WorldPulsePage() {
       {/* Legend - bottom right */}
       <Legend />
 
-      {/* Title overlay - bottom left */}
+      {/* Title overlay - bottom left (Minimal version) */}
       <div
-        style={{
-          position: 'absolute',
-          bottom: '28px',
-          left: '28px',
-          zIndex: 100,
-        }}
+        className="fixed bottom-7 left-7 z-[100] pointer-events-none"
       >
-        <h1
-          style={{
-            fontFamily: 'monospace',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.25em',
-            color: 'rgba(255,255,255,0.2)',
-            margin: 0,
-            textShadow: '0 0 20px rgba(255,255,255,0.1)',
-          }}
-        >
-          WORLD PULSE
-        </h1>
-        <p
-          style={{
-            fontFamily: 'monospace',
-            fontSize: '8px',
-            letterSpacing: '0.15em',
-            color: 'rgba(255,255,255,0.12)',
-            margin: '6px 0 0 0',
-            textTransform: 'uppercase',
-          }}
-        >
-          Real-Time Global Intelligence
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            gap: '16px',
-            marginTop: '12px',
-          }}
-        >
-          {[
-            { label: 'Flights', source: 'OpenSky' },
-            { label: 'Crypto', source: 'Blockchain' },
-            { label: 'Markets', source: 'Yahoo' },
-            { label: 'Sports', source: 'ESPN' },
-          ].map((item) => (
-            <span
-              key={item.label}
-              style={{
-                fontSize: '7px',
-                letterSpacing: '0.08em',
-                color: 'rgba(255,255,255,0.15)',
-                textTransform: 'uppercase',
-              }}
-            >
-              {item.label}: {item.source}
-            </span>
-          ))}
+        <div className="flex flex-col gap-4 opacity-40">
+          <div className="flex gap-4">
+            {[
+              { label: 'Flights', source: 'OpenSky' },
+              { label: 'Blockchain', source: 'Real-Time' },
+              { label: 'Markets', source: 'Finance' },
+              { label: 'Sports', source: 'Live' },
+            ].map((item) => (
+              <span
+                key={item.label}
+                className="text-[8px] font-mono tracking-widest text-white/50 uppercase"
+              >
+                {item.label}: {item.source}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Instructions overlay - bottom center */}
       <div
-        style={{
-          position: 'absolute',
-          bottom: '28px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          fontFamily: 'monospace',
-          fontSize: '9px',
-          letterSpacing: '0.1em',
-          color: 'rgba(255,255,255,0.15)',
-          zIndex: 100,
-          display: 'flex',
-          gap: '20px',
-        }}
+        className="fixed bottom-7 left-1/2 -translate-x-1/2 font-mono text-[9px] tracking-widest text-white/20 z-[100] flex gap-5 pointer-events-none"
       >
-        <span>Scroll to zoom</span>
-        <span style={{ opacity: 0.3 }}>•</span>
-        <span>Drag to rotate</span>
-        <span style={{ opacity: 0.3 }}>•</span>
-        <span>Hover for details</span>
-      </div>
-
-      {/* Real data badge */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '20px',
-          right: '280px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 14px',
-          background: 'rgba(34, 197, 94, 0.1)',
-          border: '1px solid rgba(34, 197, 94, 0.2)',
-          borderRadius: '20px',
-          fontFamily: 'monospace',
-          fontSize: '9px',
-          letterSpacing: '0.08em',
-          color: '#22c55e',
-          zIndex: 100,
-        }}
-      >
-        <div
-          style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            background: '#22c55e',
-            animation: 'pulse 2s ease-in-out infinite',
-          }}
-        />
-        LIVE DATA
+        <span>SCROLL TO ZOOM</span>
+        <span className="opacity-30">•</span>
+        <span>DRAG TO ROTATE</span>
+        <span className="opacity-30">•</span>
+        <span>HOVER FOR DETAILS</span>
       </div>
 
       <style>{`

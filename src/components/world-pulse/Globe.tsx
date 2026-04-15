@@ -29,58 +29,36 @@ interface GlobeProps {
 const EARTH_NIGHT_TEXTURE = '//unpkg.com/three-globe/example/img/earth-night.jpg';
 const EARTH_TOPOGRAPHY = '//unpkg.com/three-globe/example/img/earth-topology.png';
 
-// Premium color palette - sophisticated, non-blue focused
+// Premium color palette - standardized for quick visual identification
 const COLORS = {
-  flights: {
-    base: 'rgba(255, 255, 255, 0.85)',
-    fast: 'rgba(250, 204, 21, 1)',
-  },
-  crypto: {
-    btc: '#fbbf24', // Gold for Bitcoin
-    eth: '#c084fc', // Purple for Ethereum
-  },
-  markets: {
-    up: '#22c55e',
-    down: '#ef4444',
-    neutral: '#64748b',
-  },
-  sports: {
-    football: '#22c55e',
-    basketball: '#f97316',
-  },
+  flights: '#60a5fa', // Blue
+  crypto: '#fbbf24',  // Gold
+  markets: '#22c55e', // Green
+  sports: '#f97316',  // Orange
 };
 
 // Color helpers
 const getFlightColor = (velocity: number): string => {
   const normalized = Math.min(velocity / 280, 1);
-  // Bright white to gold gradient for visibility
-  const r = 255;
-  const g = Math.round(255 - normalized * 50);
-  const b = Math.round(255 - normalized * 200);
-  const alpha = 0.7 + normalized * 0.3;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  // Using the signature Blue but varying opacity/brightness by speed
+  const alpha = 0.5 + normalized * 0.5;
+  return `rgba(96, 165, 250, ${alpha})`;
 };
 
 const getCryptoArcColor = (currency: 'BTC' | 'ETH'): string[] => {
-  // Return gradient colors
-  if (currency === 'BTC') {
-    return ['rgba(251, 191, 36, 0.9)', 'rgba(251, 191, 36, 0.2)'];
-  }
-  return ['rgba(192, 132, 252, 0.9)', 'rgba(192, 132, 252, 0.2)'];
+  // Using the signature Gold for all arcs, varying gradient intensity
+  return ['rgba(251, 191, 36, 0.9)', 'rgba(251, 191, 36, 0.1)'];
 };
 
 const getSportsRingColor = (sport: 'football' | 'basketball' | 'formula1'): string => {
-  switch (sport) {
-    case 'football': return COLORS.sports.football;
-    case 'basketball': return COLORS.sports.basketball;
-    default: return '#ffffff';
-  }
+  // Using signature Orange but varying by sport if needed (keeping consistent here)
+  return COLORS.sports;
 };
 
 const getMarketColor = (changePct: number): string => {
-  if (changePct > 0.15) return COLORS.markets.up;
-  if (changePct < -0.15) return COLORS.markets.down;
-  return COLORS.markets.neutral;
+  if (changePct > 0) return COLORS.markets; // Rising
+  if (changePct < 0) return '#ef4444';      // Falling (Global convention)
+  return 'rgba(255, 255, 255, 0.3)';
 };
 
 export default function WorldGlobe({ data, layers }: GlobeProps) {
@@ -114,7 +92,7 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
         padding: 14px 18px;
         border-radius: 14px;
         font-family: 'SF Mono', 'Fira Code', monospace;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(96, 165, 250, 0.2);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         min-width: 220px;
       ">
@@ -164,13 +142,13 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
         padding: 14px 18px;
         border-radius: 14px;
         font-family: 'SF Mono', 'Fira Code', monospace;
-        border: 1px solid rgba(${d.currency === 'BTC' ? '251, 191, 36' : '192, 132, 252'}, 0.2);
+        border: 1px solid rgba(251, 191, 36, 0.2);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         min-width: 240px;
       ">
         <div style="
           font-weight: 600;
-          color: ${color};
+          color: #fbbf24;
           margin-bottom: 10px;
           font-size: 14px;
           display: flex;
@@ -274,7 +252,7 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
         padding: 14px 18px;
         border-radius: 14px;
         font-family: 'SF Mono', 'Fira Code', monospace;
-        border: 1px solid rgba(${d.sport === 'football' ? '34, 197, 94' : '249, 115, 22'}, 0.2);
+        border: 1px solid rgba(249, 115, 22, 0.2);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         min-width: 260px;
       ">
@@ -294,15 +272,15 @@ export default function WorldGlobe({ data, layers }: GlobeProps) {
           margin-bottom: 8px;
         ">
           <span style="color: #e2e8f0; font-size: 13px; font-weight: 500;">${d.home_team}</span>
-          <span style="color: ${color}; font-size: 22px; font-weight: 700;">${d.home_score}</span>
+          <span style="color: #f97316; font-size: 22px; font-weight: 700;">${d.home_score}</span>
         </div>
         <div style="
           display: flex;
           justify-content: space-between;
           align-items: center;
-        ">
+          ">
           <span style="color: #e2e8f0; font-size: 13px; font-weight: 500;">${d.away_team}</span>
-          <span style="color: ${color}; font-size: 22px; font-weight: 700;">${d.away_score}</span>
+          <span style="color: #f97316; font-size: 22px; font-weight: 700;">${d.away_score}</span>
         </div>
         <div style="
           font-size: 9px;
